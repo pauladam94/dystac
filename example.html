@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <script type="module">import * as typst from "https://cdn.jsdelivr.net/npm/@myriaddreamin/typst.ts/dist/esm/contrib/all-in-one-lite.bundle.js";
+
+function ready(fn) {
+    if (document.readyState != "loading"){
+        fn();
+    } else {
+        document.addEventListener("DOMContentLoaded", fn);
+    }
+}
+window.ready = ready;
+
+function toTypstObject(x) {
+  var obj = [];
+  for (const k in x) {
+    obj.push(`#let ${k} = ${x[k]}`)
+  }
+  return `${obj.join("\n")}`;
+}
+function makeSvg(variables, typst_code, id_svg) {
+  const content = toTypstObject(variables) + "\n#set page(width: auto, height: auto, margin: 0em)\n" + typst_code;
+  $typst.svg({ mainContent : content}).then(svg => {
+    console.log("svg : ", svg);
+    console.log("id : ", id_svg);
+    const contentSvg = document.getElementById(id_svg);
+    contentSvg.innerHTML = svg;
+
+    /*
+    const svgElem = contentSvg.firstElementChild;
+    const width = Number.parseFloat(svgElem.getAttribute('width'));
+    const height = Number.parseFloat(svgElem.getAttribute('height'));
+    svgElem.removeAttribute('width');
+    svgElem.removeAttribute('height');
+    */
+  });
+};
+window.makeSvg = makeSvg;
+// document.getElementById('typst').addEventListener('load', function () {
+$typst.setCompilerInitOptions({
+    getModule: () =>
+      'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm',
+  });
+$typst.setRendererInitOptions({
+    getModule: () =>
+      'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm',
+  });
+ // })</script>
+    <p>Here is some square at position x, y equal to</p>
+    <input id="x" type="number" value="1">
+    <p>and</p>
+    <input id="y" type="number" value="1">
+    <p>.</p>
+    <script>x.addEventListener('input', function () {
+  console.log('Input changed to:',x.value);ready(() => makeSvg({x:x.value,y:y.value,},`
+#import "@preview/cetz:0.3.4" : *
+#canvas({
+  import draw : *
+
+  rect((0, 0), (rel: (10, 10)))
+  rect((x, y), (rel: (1, 1)), stroke: 2pt + red)
+})
+`,"svg_id"));});</script>
+    <script>y.addEventListener('input', function () {
+  console.log('Input changed to:',y.value);ready(() => makeSvg({x:x.value,y:y.value,},`
+#import "@preview/cetz:0.3.4" : *
+#canvas({
+  import draw : *
+
+  rect((0, 0), (rel: (10, 10)))
+  rect((x, y), (rel: (1, 1)), stroke: 2pt + red)
+})
+`,"svg_id"));});</script>
+    <div id="svg_id"></div>
+  </body>
+</html>
