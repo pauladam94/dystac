@@ -1,6 +1,6 @@
-#import "main.typ" : dystac, dynamic, input
+#import "../main.typ" : dystac, dynamic, input
 
-#show : dystac
+#dystac()
 
 Here is some square at position x, y equal to
 #input(name: "x", default: 1) and

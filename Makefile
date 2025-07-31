@@ -1,11 +1,18 @@
-PHONY: ex clean
+.PHONY: clean all
 
-watch_html:
-	typst watch example.typ --features html --format html --open
-watch_pdf:
-	typst watch example.typ --features html --format pdf --open
-ex:
-	typst compile --features html --format html example.typ examples/index.html 
+TYP_FILES := $(wildcard *.typ)
+HTML_FILES := $(TYP_FILES:.typ=.html)
+PDF_FILES := $(TYP_FILES:.typ=.pdf)
+
+all: $(HTML_FILES) $(PDF_FILES)
+
+# Rule to build .html from .typ
+%.html: examples/%.typ
+	typst compile --root . --features html --format html $< $@
+
+# Rule to build .pdf from .typ
+%.pdf: examples/%.typ
+	typst compile --root . --features html --format pdf $< $@
 
 clean:
-	rm examples/*
+	rm -f *.html *.pdf */*.pdf */*.html
